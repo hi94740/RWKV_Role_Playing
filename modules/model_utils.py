@@ -56,6 +56,7 @@ class ModelUtils:
     begin = len(model_tokens)
     out_last = begin
     occurrence = {}
+    send_msg = ""  # Define send_msg before the loop
     for i in range(999):
       for n in occurrence:
         out[n] -= (chat_param['presence_penalty'] + occurrence[n] * chat_param['frequency_penalty'])
