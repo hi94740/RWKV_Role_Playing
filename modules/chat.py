@@ -4,6 +4,7 @@ import os, json, datetime
 import pickle
 import copy, re, gc
 import torch
+import json
 
 class Chat:
   
@@ -189,6 +190,10 @@ class Chat:
     img_bot = f'<img src="file/chars/{self.bot}.png">' if Path(f"chars/{self.bot}.png").exists() else ''
     chatbot = copy.deepcopy(self.chatbot)
     chatbot.reverse()
+    
+    # Create a list to store the chat data for JSON
+    chat_json = []
+
     for row in chatbot:
       pos_arr = list(self.__find_all_chat(row[1]))
       chat_action_data = self.__format_chat_action(pos_arr, row[1])
@@ -208,6 +213,14 @@ class Chat:
           </div>
         </div>
       """
+      
+      # Add the bot's message to the JSON data
+      chat_json.append({
+        'user': self.bot,
+        'message': msg,
+        'message_type': 'bot'
+      })
+
       if row[0] != None:
         pos_arr = list(self.__find_all_chat(row[0]))
         chat_action_data = self.__format_chat_action(pos_arr, row[0])
@@ -224,7 +237,20 @@ class Chat:
             </div>
           </div>
         """
+        
+        # Add the user's message to the JSON data
+        chat_json.append({
+          'user': self.user,
+          'message': msg,
+          'message_type': 'user'
+        })
+
     output += "</div>"
+
+    # Convert the chat data to JSON and embed it in a script tag
+    json_str = json.dumps(chat_json)
+    output += f'<script type="application/json" id="chatData">{json_str}</script>'
+
     return output
   
   def __get_chatbot_str(self, chatbot):
